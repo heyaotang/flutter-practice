@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 
-/// App-wide constants for consistent styling and spacing.
+/// App-wide constants for consistent styling and behavior.
 class AppConstants {
   AppConstants._();
 
-  // App Info
+  // App Information
   static const String appName = 'Flutter Practice';
 
   // Theme
@@ -21,7 +21,7 @@ class AppConstants {
   static const double fontSizeBody = 16.0;
   static const double fontSizeCaption = 14.0;
 
-  // Navigation
+  // Bottom Navigation
   static const List<String> tabTitles = [
     'Home',
     'Categories',
@@ -46,6 +46,7 @@ class AppConstants {
 
   // Home Page
   static const double bannerHeight = 300.0;
+  static const Duration bannerAutoPlayInterval = Duration(seconds: 3);
   static const double categoriesHeight = 100.0;
   static const double categoryItemSize = 80.0;
   static const int productBatchSize = 10;

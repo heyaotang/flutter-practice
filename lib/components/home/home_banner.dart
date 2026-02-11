@@ -12,21 +12,15 @@ class HomeBanner extends StatefulWidget {
     this.autoPlayInterval,
   });
 
-  /// List of banner image URLs.
   final List<String> images;
-
-  /// Custom auto-play interval. If null, uses [AppConstants.bannerAutoPlayInterval].
   final Duration? autoPlayInterval;
 
   @override
   State<HomeBanner> createState() => _HomeBannerState();
 }
 
-/// Banner page widget with keep-alive support for smooth carousel transitions.
 class _BannerPage extends StatefulWidget {
-  const _BannerPage({
-    required this.imageUrl,
-  });
+  const _BannerPage({required this.imageUrl});
 
   final String imageUrl;
 
@@ -45,46 +39,28 @@ class _BannerPageState extends State<_BannerPage>
     return Image.network(
       widget.imageUrl,
       fit: BoxFit.cover,
-      loadingBuilder: _buildLoadingPlaceholder,
+      loadingBuilder: (context, child, progress) {
+        if (progress == null) return child;
+        final value = progress.expectedTotalBytes != null
+            ? progress.cumulativeBytesLoaded / progress.expectedTotalBytes!
+            : null;
+        return Container(
+          color: Colors.grey[300],
+          child: Center(
+            child: CircularProgressIndicator(
+              value: value,
+              color: Theme.of(context).colorScheme.primary,
+            ),
+          ),
+        );
+      },
       errorBuilder: ImageHelpers.buildErrorBuilder(iconSize: 48),
-      frameBuilder: _buildFadeInAnimation,
-    );
-  }
-
-  Widget _buildLoadingPlaceholder(
-    BuildContext context,
-    Widget child,
-    ImageChunkEvent? loadingProgress,
-  ) {
-    if (loadingProgress == null) return child;
-
-    final progress = loadingProgress.expectedTotalBytes != null
-        ? loadingProgress.cumulativeBytesLoaded /
-            loadingProgress.expectedTotalBytes!
-        : null;
-
-    return Container(
-      color: Colors.grey[300],
-      child: Center(
-        child: CircularProgressIndicator(
-          value: progress,
-          color: Theme.of(context).colorScheme.primary,
-        ),
+      frameBuilder: (context, child, frame, _) => AnimatedOpacity(
+        opacity: frame == null ? 0 : 1,
+        duration: const Duration(milliseconds: 300),
+        curve: Curves.easeOut,
+        child: child,
       ),
-    );
-  }
-
-  Widget _buildFadeInAnimation(
-    BuildContext context,
-    Widget child,
-    int? frame,
-    bool wasSynchronouslyLoaded,
-  ) {
-    return AnimatedOpacity(
-      opacity: frame == null ? 0 : 1,
-      duration: const Duration(milliseconds: 300),
-      curve: Curves.easeOut,
-      child: child,
     );
   }
 }
@@ -107,14 +83,13 @@ class _HomeBannerState extends State<HomeBanner> {
 
   int get _bannerCount => widget.images.length;
 
-  List<String> get _carouselImages {
-    if (widget.images.isEmpty) return [];
-    return [
-      widget.images.last,
-      ...widget.images,
-      widget.images.first,
-    ];
-  }
+  List<String> get _carouselImages => widget.images.isEmpty
+      ? []
+      : [
+          widget.images.last,
+          ...widget.images,
+          widget.images.first,
+        ];
 
   int _getRealIndex(int page) {
     if (page == 0) return _bannerCount - 1;
@@ -139,7 +114,6 @@ class _HomeBannerState extends State<HomeBanner> {
     _stopAutoPlay();
     _autoPlayTimer = Timer.periodic(_autoPlayInterval, (_) {
       if (!_pageController.hasClients) return;
-
       _currentPage++;
       _pageController.animateToPage(
         _currentPage,
@@ -167,14 +141,6 @@ class _HomeBannerState extends State<HomeBanner> {
     setState(() {});
   }
 
-  void _handleUserInteractionStart(_) {
-    _stopAutoPlay();
-  }
-
-  void _handleUserInteractionEnd() {
-    _startAutoPlay();
-  }
-
   @override
   Widget build(BuildContext context) {
     return SizedBox(
@@ -182,9 +148,9 @@ class _HomeBannerState extends State<HomeBanner> {
       child: Stack(
         children: [
           GestureDetector(
-            onPanDown: _handleUserInteractionStart,
-            onPanEnd: (_) => _handleUserInteractionEnd(),
-            onPanCancel: _handleUserInteractionEnd,
+            onPanDown: (_) => _stopAutoPlay(),
+            onPanEnd: (_) => _startAutoPlay(),
+            onPanCancel: _startAutoPlay,
             child: PageView.builder(
               controller: _pageController,
               onPageChanged: _handlePageChange,
@@ -194,35 +160,28 @@ class _HomeBannerState extends State<HomeBanner> {
               },
             ),
           ),
-          _buildDotIndicators(),
-        ],
-      ),
-    );
-  }
-
-  Positioned _buildDotIndicators() {
-    return Positioned(
-      bottom: _indicatorBottomMargin,
-      left: 0,
-      right: 0,
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: List.generate(
-          _bannerCount,
-          (index) => _DotIndicator(
-            isActive: index == _getRealIndex(_currentPage),
+          Positioned(
+            bottom: _indicatorBottomMargin,
+            left: 0,
+            right: 0,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: List.generate(
+                _bannerCount,
+                (index) => _DotIndicator(
+                  isActive: index == _getRealIndex(_currentPage),
+                ),
+              ),
+            ),
           ),
-        ),
+        ],
       ),
     );
   }
 }
 
-/// Dot indicator widget for banner carousel.
 class _DotIndicator extends StatelessWidget {
-  const _DotIndicator({
-    required this.isActive,
-  });
+  const _DotIndicator({required this.isActive});
 
   final bool isActive;
 

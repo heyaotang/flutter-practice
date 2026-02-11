@@ -4,10 +4,12 @@ import 'package:flutter/material.dart';
 class LoadingIndicator extends StatelessWidget {
   const LoadingIndicator({super.key});
 
+  static const double _padding = 16.0;
+
   @override
   Widget build(BuildContext context) {
     return const Padding(
-      padding: EdgeInsets.all(16),
+      padding: EdgeInsets.all(_padding),
       child: Center(
         child: CircularProgressIndicator(),
       ),

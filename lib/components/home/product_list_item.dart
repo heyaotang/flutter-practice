@@ -9,17 +9,27 @@ class ProductListItem extends StatelessWidget {
   final Product product;
 
   static const double _imageSize = 80.0;
+  static const double _spacing = 16.0;
+  static const double _verticalSpacing = 8.0;
+  static const double _namePriceSpacing = 4.0;
+  static const double _borderRadius = 8.0;
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+    final textTheme = Theme.of(context).textTheme;
+
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+      padding: const EdgeInsets.symmetric(
+        vertical: _verticalSpacing,
+        horizontal: _spacing,
+      ),
       child: Row(
         children: [
           ClipRRect(
-            borderRadius: BorderRadius.circular(8),
+            borderRadius: BorderRadius.circular(_borderRadius),
             child: Image.network(
-              product.imageUrl,
+              product.image,
               width: _imageSize,
               height: _imageSize,
               fit: BoxFit.cover,
@@ -30,25 +40,20 @@ class ProductListItem extends StatelessWidget {
               ),
             ),
           ),
-          const SizedBox(width: 16),
+          const SizedBox(width: _spacing),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
+                Text(product.name, style: textTheme.titleSmall),
+                const SizedBox(height: _namePriceSpacing),
                 Text(
-                  product.name,
-                  style: Theme.of(context).textTheme.titleSmall,
-                ),
-                if (product.price != null) ...[
-                  const SizedBox(height: 4),
-                  Text(
-                    '\$${product.price!.toStringAsFixed(2)}',
-                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                          color: Theme.of(context).colorScheme.primary,
-                          fontWeight: FontWeight.bold,
-                        ),
+                  '\$${product.price.toStringAsFixed(2)}',
+                  style: textTheme.bodyMedium?.copyWith(
+                    color: colorScheme.primary,
+                    fontWeight: FontWeight.bold,
                   ),
-                ],
+                ),
               ],
             ),
           ),

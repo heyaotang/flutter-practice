@@ -20,11 +20,9 @@ class ApiException implements Exception {
     return 'ApiException: $message';
   }
 
-  /// Creates an [ApiException] from a [DioException].
   static ApiException fromDioError(DioException error) {
     final statusCode = error.response?.statusCode;
 
-    // Handle timeout errors.
     if (error.type == DioExceptionType.connectionTimeout ||
         error.type == DioExceptionType.sendTimeout ||
         error.type == DioExceptionType.receiveTimeout) {
@@ -33,38 +31,32 @@ class ApiException implements Exception {
       );
     }
 
-    // Handle connection errors.
     if (error.type == DioExceptionType.connectionError) {
       return const ApiException(
         message: 'No internet connection. Please check your network.',
       );
     }
 
-    // Handle cancelled requests.
     if (error.type == DioExceptionType.cancel) {
       return const ApiException(
         message: 'Request was cancelled.',
       );
     }
 
-    // Handle bad response.
     if (error.type == DioExceptionType.badResponse) {
       return _handleBadResponse(error, statusCode);
     }
 
-    // Handle unknown errors.
-    final message =
-        error.message ?? 'An unknown error occurred. Please try again.';
-    return ApiException(message: message);
+    return ApiException(
+      message: error.message ?? 'An unknown error occurred. Please try again.',
+    );
   }
 
   static ApiException _handleBadResponse(DioException error, int? statusCode) {
     final data = error.response?.data;
-
     String message = 'Something went wrong';
     String? errorCode;
 
-    // Extract error message from response data.
     if (data is Map<String, dynamic>) {
       message = data['message'] as String? ?? message;
       errorCode = data['code'] as String?;
@@ -72,47 +64,34 @@ class ApiException implements Exception {
       message = data;
     }
 
-    switch (statusCode) {
-      case 400:
-        return ApiException(
+    return switch (statusCode) {
+      400 => ApiException(
           message: message,
           statusCode: statusCode,
           errorCode: errorCode,
-        );
-
-      case 401:
-        return const ApiException(
+        ),
+      401 => const ApiException(
           message: 'Authentication failed. Please login again.',
           statusCode: 401,
-        );
-
-      case 403:
-        return const ApiException(
+        ),
+      403 => const ApiException(
           message: 'You do not have permission to access this resource.',
           statusCode: 403,
-        );
-
-      case 404:
-        return ApiException(
+        ),
+      404 => ApiException(
           message: message,
           statusCode: statusCode,
           errorCode: errorCode,
-        );
-
-      case 500:
-      case 502:
-      case 503:
-        return const ApiException(
+        ),
+      500 || 502 || 503 => const ApiException(
           message: 'Server error. Please try again later.',
           statusCode: 500,
-        );
-
-      default:
-        return ApiException(
+        ),
+      _ => ApiException(
           message: message,
           statusCode: statusCode,
           errorCode: errorCode,
-        );
-    }
+        ),
+    };
   }
 }

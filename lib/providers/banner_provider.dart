@@ -27,8 +27,7 @@ class BannerProvider extends ChangeNotifier {
     _clearError();
 
     try {
-      final banners = await _repository.getBanners();
-      _banners = banners;
+      _banners = await _repository.getBanners();
     } catch (error) {
       _setError(error);
       _banners = [];

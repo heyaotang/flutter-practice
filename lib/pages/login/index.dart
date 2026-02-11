@@ -14,37 +14,19 @@ class LoginPage extends StatelessWidget {
       appBar: AppBar(
         title: const Text('Login'),
       ),
-      body: const Center(
-        child: _LoginContent(),
+      body: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            const PagePlaceholder(title: title),
+            const SizedBox(height: AppConstants.spacingLarge),
+            ElevatedButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text('Back'),
+            ),
+          ],
+        ),
       ),
-    );
-  }
-}
-
-class _LoginContent extends StatelessWidget {
-  const _LoginContent();
-
-  @override
-  Widget build(BuildContext context) {
-    return const Column(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        PagePlaceholder(title: LoginPage.title),
-        SizedBox(height: AppConstants.spacingLarge),
-        _BackButton(),
-      ],
-    );
-  }
-}
-
-class _BackButton extends StatelessWidget {
-  const _BackButton();
-
-  @override
-  Widget build(BuildContext context) {
-    return ElevatedButton(
-      onPressed: () => Navigator.pop(context),
-      child: const Text('Back'),
     );
   }
 }

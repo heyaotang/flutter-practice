@@ -1,5 +1,6 @@
 export 'home_banner.dart';
 export 'home_categories.dart';
+export 'home_grid_builder.dart';
 export 'home_hots.dart';
 export 'home_products.dart';
 export 'home_suggestions.dart';

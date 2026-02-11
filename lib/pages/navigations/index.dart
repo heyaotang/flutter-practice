@@ -8,39 +8,8 @@ import 'package:flutter_practice/providers/navigation_provider.dart';
 import 'package:provider/provider.dart';
 
 /// Main navigation page with bottom tab bar.
-///
-/// Uses IndexedStack to maintain state across tab switches.
 class NavigationsPage extends StatelessWidget {
   const NavigationsPage({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Consumer<NavigationProvider>(
-      builder: (context, provider, child) {
-        return Scaffold(
-          appBar: _buildAppBar(provider.currentIndex),
-          body: const SafeArea(
-            child: _NavigationStack(),
-          ),
-          bottomNavigationBar: _BottomNavigationBar(
-            currentIndex: provider.currentIndex,
-            onTap: provider.setTabIndex,
-          ),
-        );
-      },
-    );
-  }
-
-  PreferredSizeWidget _buildAppBar(int currentIndex) {
-    return AppBar(
-      title: Text(AppConstants.tabTitles[currentIndex]),
-    );
-  }
-}
-
-/// IndexedStack to maintain state of all tabs.
-class _NavigationStack extends StatelessWidget {
-  const _NavigationStack();
 
   static const List<Widget> _pages = [
     HomePage(),
@@ -49,30 +18,7 @@ class _NavigationStack extends StatelessWidget {
     ProfilePage(),
   ];
 
-  @override
-  Widget build(BuildContext context) {
-    return Consumer<NavigationProvider>(
-      builder: (context, provider, child) {
-        return IndexedStack(
-          index: provider.currentIndex,
-          children: _pages,
-        );
-      },
-    );
-  }
-}
-
-/// Bottom navigation bar with tab indicators.
-class _BottomNavigationBar extends StatelessWidget {
-  const _BottomNavigationBar({
-    required this.currentIndex,
-    required this.onTap,
-  });
-
-  final int currentIndex;
-  final void Function(int) onTap;
-
-  static const List<BottomNavigationBarItem> _items = [
+  static const List<BottomNavigationBarItem> _navItems = [
     BottomNavigationBarItem(
       icon: Icon(AppConstants.homeIcon),
       activeIcon: Icon(AppConstants.homeIconActive),
@@ -97,11 +43,39 @@ class _BottomNavigationBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BottomNavigationBar(
-      currentIndex: currentIndex,
-      onTap: onTap,
-      type: BottomNavigationBarType.fixed,
-      items: _items,
+    return Consumer<NavigationProvider>(
+      builder: (context, provider, _) {
+        return Scaffold(
+          appBar: AppBar(
+            title: Text(AppConstants.tabTitles[provider.currentIndex]),
+          ),
+          body: const SafeArea(
+            child: _NavigationStack(),
+          ),
+          bottomNavigationBar: BottomNavigationBar(
+            currentIndex: provider.currentIndex,
+            onTap: provider.setTabIndex,
+            type: BottomNavigationBarType.fixed,
+            items: _navItems,
+          ),
+        );
+      },
+    );
+  }
+}
+
+class _NavigationStack extends StatelessWidget {
+  const _NavigationStack();
+
+  @override
+  Widget build(BuildContext context) {
+    return Consumer<NavigationProvider>(
+      builder: (context, provider, _) {
+        return IndexedStack(
+          index: provider.currentIndex,
+          children: NavigationsPage._pages,
+        );
+      },
     );
   }
 }

@@ -23,14 +23,35 @@ class PagePlaceholder extends StatelessWidget {
           title,
           style: const TextStyle(fontSize: AppConstants.fontSizeTitle),
         ),
-        if (subtitle != null) ...[
+        if (subtitle != null)
           const SizedBox(height: AppConstants.spacingMedium),
+        if (subtitle != null)
           Text(
             subtitle!,
             style: const TextStyle(fontSize: AppConstants.fontSizeBody),
           ),
-        ],
       ],
+    );
+  }
+}
+
+/// Complete placeholder page with scaffold.
+class PlaceholderPage extends StatelessWidget {
+  const PlaceholderPage({
+    super.key,
+    required this.title,
+    this.subtitle,
+  });
+
+  final String title;
+  final String? subtitle;
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: Center(
+        child: PagePlaceholder(title: title, subtitle: subtitle),
+      ),
     );
   }
 }

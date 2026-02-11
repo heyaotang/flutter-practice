@@ -43,11 +43,7 @@ class _HomePageState extends State<HomePage> {
             const SliverToBoxAdapter(child: _SectionHeader('Hot Items')),
             const SliverToBoxAdapter(child: HomeHots()),
             const SliverToBoxAdapter(child: _SectionHeader('All Products')),
-            const SliverFillRemaining(
-              hasScrollBody: true,
-              fillOverscroll: false,
-              child: HomeProducts(),
-            ),
+            const HomeProducts(),
           ],
         ),
       ),
@@ -55,7 +51,6 @@ class _HomePageState extends State<HomePage> {
   }
 }
 
-/// Banner section that listens to BannerProvider state changes.
 class _BannerSection extends StatefulWidget {
   const _BannerSection({required this.provider});
 
@@ -79,9 +74,7 @@ class _BannerSectionState extends State<_BannerSection> {
   }
 
   void _onProviderChanged() {
-    if (mounted) {
-      setState(() {});
-    }
+    if (mounted) setState(() {});
   }
 
   @override
@@ -89,49 +82,28 @@ class _BannerSectionState extends State<_BannerSection> {
     final provider = widget.provider;
 
     if (provider.isLoading) {
-      return const _BannerLoadingIndicator();
+      return const SizedBox(
+        height: AppConstants.bannerHeight,
+        child: Center(child: CircularProgressIndicator()),
+      );
     }
 
     if (provider.hasError) {
-      return _BannerError(message: provider.errorMessage!);
-    }
-
-    if (!provider.hasBanners) {
-      return const SizedBox.shrink();
-    }
-
-    final images = provider.banners.map((banner) => banner.image).toList();
-    return HomeBanner(images: images);
-  }
-}
-
-class _BannerLoadingIndicator extends StatelessWidget {
-  const _BannerLoadingIndicator();
-
-  @override
-  Widget build(BuildContext context) {
-    return const SizedBox(
-      height: AppConstants.bannerHeight,
-      child: Center(child: CircularProgressIndicator()),
-    );
-  }
-}
-
-class _BannerError extends StatelessWidget {
-  const _BannerError({required this.message});
-
-  final String message;
-
-  @override
-  Widget build(BuildContext context) {
-    return SizedBox(
-      height: AppConstants.bannerHeight,
-      child: Center(
-        child: Text(
-          message,
-          style: Theme.of(context).textTheme.bodyMedium,
+      return SizedBox(
+        height: AppConstants.bannerHeight,
+        child: Center(
+          child: Text(
+            provider.errorMessage!,
+            style: Theme.of(context).textTheme.bodyMedium,
+          ),
         ),
-      ),
+      );
+    }
+
+    if (!provider.hasBanners) return const SizedBox.shrink();
+
+    return HomeBanner(
+      images: provider.banners.map((b) => b.image).toList(),
     );
   }
 }

@@ -8,6 +8,9 @@ class ProductCard extends StatelessWidget {
 
   final Product product;
 
+  static const double _borderRadius = 8.0;
+  static const double _spacing = 8.0;
+
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -15,15 +18,15 @@ class ProductCard extends StatelessWidget {
       children: [
         Expanded(
           child: ClipRRect(
-            borderRadius: BorderRadius.circular(8),
+            borderRadius: BorderRadius.circular(_borderRadius),
             child: Image.network(
-              product.imageUrl,
+              product.image,
               fit: BoxFit.cover,
               errorBuilder: ImageHelpers.buildErrorBuilder(),
             ),
           ),
         ),
-        const SizedBox(height: 8),
+        const SizedBox(height: _spacing),
         Text(
           product.name,
           style: Theme.of(context).textTheme.bodySmall,

@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_practice/core/widgets/page_placeholder.dart';
 
 /// Messages page for user notifications and chats.
@@ -10,13 +10,9 @@ class MessagesPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const Scaffold(
-      body: Center(
-        child: PagePlaceholder(
-          title: title,
-          subtitle: subtitle,
-        ),
-      ),
+    return const PlaceholderPage(
+      title: title,
+      subtitle: subtitle,
     );
   }
 }

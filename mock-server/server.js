@@ -29,6 +29,28 @@ const MOCK_DATA = {
   ],
 };
 
+// Product constants
+const TOTAL_PRODUCTS = 102;
+
+// UUID v4 generator
+function generateUUID() {
+  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, (c) => {
+    const r = Math.random() * 16 | 0;
+    const v = c === 'x' ? r : (r & 0x3 | 0x8);
+    return v.toString(16);
+  });
+}
+
+// Generate a single product
+function generateProduct(index) {
+  return {
+    id: generateUUID(),
+    name: `Product ${index + 1}`,
+    image: `http://localhost:3000/assets/images/products/product.jpg`,
+    price: parseFloat(((index + 1) * 10 + Math.random() * 100).toFixed(2)),
+  };
+}
+
 // Create Fastify instance
 const fastify = Fastify({
   logger: true,
@@ -72,6 +94,43 @@ fastify.post('/get-banners', async (request, reply) => {
   } catch (error) {
     fastify.log.error('Error fetching banners:', error);
     return reply.code(500).send(createErrorResponse('Failed to fetch banners'));
+  }
+});
+
+// Get products endpoint with pagination
+fastify.post('/get-products', async (request, reply) => {
+  try {
+    const { offset = 0, limit = 20 } = request.body || {};
+
+    const start = Math.max(0, parseInt(offset) || 0);
+    const pageSize = parseInt(limit) || 20;
+    const end = Math.min(start + pageSize, TOTAL_PRODUCTS);
+
+    // If offset is beyond total products, return empty array
+    if (start >= TOTAL_PRODUCTS) {
+      return createSuccessResponse({
+        products: [],
+        total: TOTAL_PRODUCTS,
+        hasMore: false,
+      });
+    }
+
+    // Generate products for this page
+    const products = [];
+    for (let i = start; i < end; i++) {
+      products.push(generateProduct(i));
+    }
+
+    const hasMore = end < TOTAL_PRODUCTS;
+
+    return createSuccessResponse({
+      products,
+      total: TOTAL_PRODUCTS,
+      hasMore,
+    });
+  } catch (error) {
+    fastify.log.error('Error fetching products:', error);
+    return reply.code(500).send(createErrorResponse('Failed to fetch products'));
   }
 });
 

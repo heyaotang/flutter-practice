@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_practice/core/constants/app_constants.dart';
+import 'package:flutter_practice/core/widgets/page_placeholder.dart';
 
 /// Page displayed when a route is not found.
 class NotFoundPage extends StatelessWidget {
@@ -13,12 +13,7 @@ class NotFoundPage extends StatelessWidget {
       appBar: AppBar(
         title: const Text('Not Found'),
       ),
-      body: const Center(
-        child: Text(
-          title,
-          style: TextStyle(fontSize: AppConstants.fontSizeTitle),
-        ),
-      ),
+      body: const PlaceholderPage(title: title),
     );
   }
 }

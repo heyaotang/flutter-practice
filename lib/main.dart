@@ -21,19 +21,15 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: AppConstants.appName,
       debugShowCheckedModeBanner: false,
-      theme: _buildTheme(),
+      theme: ThemeData(
+        colorScheme: ColorScheme.fromSeed(
+          seedColor: AppConstants.primarySeedColor,
+        ),
+        useMaterial3: true,
+      ),
       initialRoute: AppRoutes.navigations,
       routes: AppRoutes.routes,
       onUnknownRoute: AppRoutes.onUnknownRoute,
-    );
-  }
-
-  ThemeData _buildTheme() {
-    return ThemeData(
-      colorScheme: ColorScheme.fromSeed(
-        seedColor: AppConstants.primarySeedColor,
-      ),
-      useMaterial3: true,
     );
   }
 }

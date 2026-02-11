@@ -11,28 +11,28 @@ class ProductGrid extends StatelessWidget {
 
   final List<Product> products;
 
-  static const double spacing = 16.0;
-  static const int crossAxisCount = 2;
+  static const double _spacing = 16.0;
+  static const int _crossAxisCount = 2;
 
   static const _gridDelegate = SliverGridDelegateWithFixedCrossAxisCount(
-    crossAxisCount: crossAxisCount,
-    mainAxisSpacing: spacing,
-    crossAxisSpacing: spacing,
+    crossAxisCount: _crossAxisCount,
+    mainAxisSpacing: _spacing,
+    crossAxisSpacing: _spacing,
     childAspectRatio: 1,
   );
 
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: spacing),
+      padding: const EdgeInsets.symmetric(horizontal: _spacing),
       child: GridView.builder(
         shrinkWrap: true,
         physics: const NeverScrollableScrollPhysics(),
         gridDelegate: _gridDelegate,
         itemCount: products.length,
-        itemBuilder: (context, index) {
-          return ProductCard(product: products[index]);
-        },
+        itemBuilder: (context, index) => ProductCard(
+          product: products[index],
+        ),
       ),
     );
   }

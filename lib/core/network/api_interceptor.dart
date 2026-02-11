@@ -25,10 +25,7 @@ class ApiInterceptor extends Interceptor {
       options.headers['Authorization'] = 'Bearer $token';
     }
 
-    if (enableLogging) {
-      _logRequest(options);
-    }
-
+    if (enableLogging) _logRequest(options);
     handler.next(options);
   }
 
@@ -36,8 +33,8 @@ class ApiInterceptor extends Interceptor {
   void onResponse(Response response, ResponseInterceptorHandler handler) {
     if (extractData && response.data is Map<String, dynamic>) {
       final data = response.data as Map<String, dynamic>;
-
       final code = data['code'] as String?;
+
       if (code != null && code != _successCode) {
         final message = data['message'] as String? ?? _defaultErrorMessage;
         handler.reject(
@@ -60,19 +57,13 @@ class ApiInterceptor extends Interceptor {
       }
     }
 
-    if (enableLogging) {
-      _logResponse(response);
-    }
-
+    if (enableLogging) _logResponse(response);
     handler.next(response);
   }
 
   @override
   void onError(DioException err, ErrorInterceptorHandler handler) {
-    if (enableLogging) {
-      _logError(err);
-    }
-
+    if (enableLogging) _logError(err);
     handler.next(err);
   }
 

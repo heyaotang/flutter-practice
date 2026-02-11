@@ -13,7 +13,7 @@ class BannerRepository {
 
   /// Fetches a list of banners from the API.
   Future<List<BannerData>> getBanners() async {
-    final dynamic response = await _apiClient.post('/get-banners');
+    final response = await _apiClient.post('/get-banners');
 
     if (response is! List) {
       debugPrint('Invalid response type: ${response.runtimeType}');
@@ -22,7 +22,7 @@ class BannerRepository {
 
     try {
       return response
-          .map<dynamic>((item) =>
+          .map((item) =>
               item is Map<String, dynamic> ? BannerData.fromJson(item) : null)
           .whereType<BannerData>()
           .toList();

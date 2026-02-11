@@ -6,11 +6,8 @@ import 'api_interceptor.dart';
 
 /// Enterprise-grade HTTP client based on Dio.
 class ApiClient {
-  ApiClient._({
-    required this.dio,
-  });
+  ApiClient._({required this.dio});
 
-  /// Creates a new [ApiClient] instance.
   factory ApiClient.create({
     String? baseUrl,
     Duration? connectTimeout,
@@ -24,20 +21,13 @@ class ApiClient {
   }) {
     final baseOptions = ApiConfig.dioOptions;
 
-    // Apply custom overrides.
     if (baseUrl != null) baseOptions.baseUrl = baseUrl;
-    if (connectTimeout != null) {
-      baseOptions.connectTimeout = connectTimeout;
-    }
-    if (receiveTimeout != null) {
-      baseOptions.receiveTimeout = receiveTimeout;
-    }
+    if (connectTimeout != null) baseOptions.connectTimeout = connectTimeout;
+    if (receiveTimeout != null) baseOptions.receiveTimeout = receiveTimeout;
     if (sendTimeout != null) baseOptions.sendTimeout = sendTimeout;
     if (headers != null) baseOptions.headers.addAll(headers);
 
     final dio = Dio(baseOptions);
-
-    // Add main interceptor.
     dio.interceptors.add(
       ApiInterceptor(
         enableLogging: enableLogging,
@@ -46,7 +36,6 @@ class ApiClient {
       ),
     );
 
-    // Add additional interceptors if provided.
     if (additionalInterceptors != null) {
       dio.interceptors.addAll(additionalInterceptors);
     }
@@ -56,12 +45,8 @@ class ApiClient {
 
   final Dio dio;
 
-  /// Returns the underlying Dio instance for advanced usage.
   Dio get client => dio;
 
-  // ========== HTTP Methods ==========
-
-  /// Performs a GET request.
   Future<T> get<T>(
     String path, {
     Map<String, dynamic>? queryParameters,
@@ -69,20 +54,18 @@ class ApiClient {
     CancelToken? cancelToken,
     ProgressCallback? onReceiveProgress,
     T Function(dynamic data)? decoder,
-  }) async {
-    return _request<T>(
-      () => dio.get(
-        path,
-        queryParameters: queryParameters,
-        options: options,
-        cancelToken: cancelToken,
-        onReceiveProgress: onReceiveProgress,
-      ),
-      decoder,
-    );
-  }
+  }) =>
+      _request<T>(
+        () => dio.get(
+          path,
+          queryParameters: queryParameters,
+          options: options,
+          cancelToken: cancelToken,
+          onReceiveProgress: onReceiveProgress,
+        ),
+        decoder,
+      );
 
-  /// Performs a POST request.
   Future<T> post<T>(
     String path, {
     dynamic data,
@@ -92,22 +75,20 @@ class ApiClient {
     ProgressCallback? onSendProgress,
     ProgressCallback? onReceiveProgress,
     T Function(dynamic data)? decoder,
-  }) async {
-    return _request<T>(
-      () => dio.post(
-        path,
-        data: data ?? {},
-        queryParameters: queryParameters,
-        options: options,
-        cancelToken: cancelToken,
-        onSendProgress: onSendProgress,
-        onReceiveProgress: onReceiveProgress,
-      ),
-      decoder,
-    );
-  }
+  }) =>
+      _request<T>(
+        () => dio.post(
+          path,
+          data: data ?? {},
+          queryParameters: queryParameters,
+          options: options,
+          cancelToken: cancelToken,
+          onSendProgress: onSendProgress,
+          onReceiveProgress: onReceiveProgress,
+        ),
+        decoder,
+      );
 
-  /// Performs a PUT request.
   Future<T> put<T>(
     String path, {
     dynamic data,
@@ -117,22 +98,20 @@ class ApiClient {
     ProgressCallback? onSendProgress,
     ProgressCallback? onReceiveProgress,
     T Function(dynamic data)? decoder,
-  }) async {
-    return _request<T>(
-      () => dio.put(
-        path,
-        data: data,
-        queryParameters: queryParameters,
-        options: options,
-        cancelToken: cancelToken,
-        onSendProgress: onSendProgress,
-        onReceiveProgress: onReceiveProgress,
-      ),
-      decoder,
-    );
-  }
+  }) =>
+      _request<T>(
+        () => dio.put(
+          path,
+          data: data,
+          queryParameters: queryParameters,
+          options: options,
+          cancelToken: cancelToken,
+          onSendProgress: onSendProgress,
+          onReceiveProgress: onReceiveProgress,
+        ),
+        decoder,
+      );
 
-  /// Performs a PATCH request.
   Future<T> patch<T>(
     String path, {
     dynamic data,
@@ -142,22 +121,20 @@ class ApiClient {
     ProgressCallback? onSendProgress,
     ProgressCallback? onReceiveProgress,
     T Function(dynamic data)? decoder,
-  }) async {
-    return _request<T>(
-      () => dio.patch(
-        path,
-        data: data,
-        queryParameters: queryParameters,
-        options: options,
-        cancelToken: cancelToken,
-        onSendProgress: onSendProgress,
-        onReceiveProgress: onReceiveProgress,
-      ),
-      decoder,
-    );
-  }
+  }) =>
+      _request<T>(
+        () => dio.patch(
+          path,
+          data: data,
+          queryParameters: queryParameters,
+          options: options,
+          cancelToken: cancelToken,
+          onSendProgress: onSendProgress,
+          onReceiveProgress: onReceiveProgress,
+        ),
+        decoder,
+      );
 
-  /// Performs a DELETE request.
   Future<T> delete<T>(
     String path, {
     dynamic data,
@@ -165,18 +142,17 @@ class ApiClient {
     Options? options,
     CancelToken? cancelToken,
     T Function(dynamic data)? decoder,
-  }) async {
-    return _request<T>(
-      () => dio.delete(
-        path,
-        data: data,
-        queryParameters: queryParameters,
-        options: options,
-        cancelToken: cancelToken,
-      ),
-      decoder,
-    );
-  }
+  }) =>
+      _request<T>(
+        () => dio.delete(
+          path,
+          data: data,
+          queryParameters: queryParameters,
+          options: options,
+          cancelToken: cancelToken,
+        ),
+        decoder,
+      );
 
   Future<T> _request<T>(
     Future<Response> Function() request,
@@ -190,7 +166,6 @@ class ApiClient {
     }
   }
 
-  /// Downloads a file.
   Future<String> download(
     String urlPath,
     String savePath, {
@@ -220,22 +195,16 @@ class ApiClient {
     }
   }
 
-  // ========== Utility Methods ==========
-
-  /// Creates a cancel token for cancelling requests.
   CancelToken createCancelToken() => CancelToken();
 
-  /// Updates the base URL.
   void updateBaseUrl(String baseUrl) {
     dio.options.baseUrl = baseUrl;
   }
 
-  /// Updates the default headers.
   void updateHeaders(Map<String, String> headers) {
     dio.options.headers.addAll(headers);
   }
 
-  /// Clears all headers.
   void clearHeaders() {
     dio.options.headers.clear();
   }

@@ -12,6 +12,7 @@ class HomeCategories extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final categories = MockDataGenerator.getCategories(count: _categoryCount);
+    final colorScheme = Theme.of(context).colorScheme;
 
     return SizedBox(
       height: AppConstants.categoriesHeight,
@@ -21,7 +22,13 @@ class HomeCategories extends StatelessWidget {
         itemCount: categories.length,
         itemBuilder: (context, index) {
           final category = categories[index];
-          return _CategoryItem(category: category);
+          return Padding(
+            padding: const EdgeInsets.only(right: 16),
+            child: _CategoryItem(
+              category: category,
+              colorScheme: colorScheme,
+            ),
+          );
         },
       ),
     );
@@ -29,40 +36,36 @@ class HomeCategories extends StatelessWidget {
 }
 
 class _CategoryItem extends StatelessWidget {
-  const _CategoryItem({required this.category});
+  const _CategoryItem({
+    required this.category,
+    required this.colorScheme,
+  });
 
   final Category category;
+  final ColorScheme colorScheme;
 
-  static const double iconSize = 32.0;
-  static const double spacing = 8.0;
+  static const double _iconSize = 32.0;
+  static const double _spacing = 8.0;
+  static const double _itemSize = AppConstants.categoryItemSize;
 
   @override
   Widget build(BuildContext context) {
-    const itemSize = AppConstants.categoryItemSize;
-
-    return Padding(
-      padding: const EdgeInsets.only(right: 16),
-      child: SizedBox(
-        width: itemSize,
-        height: itemSize,
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(
-              category.icon,
-              size: iconSize,
-              color: Theme.of(context).colorScheme.primary,
-            ),
-            const SizedBox(height: spacing),
-            Text(
-              category.name,
-              style: Theme.of(context).textTheme.labelSmall,
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-              textAlign: TextAlign.center,
-            ),
-          ],
-        ),
+    return SizedBox(
+      width: _itemSize,
+      height: _itemSize,
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(category.icon, size: _iconSize, color: colorScheme.primary),
+          const SizedBox(height: _spacing),
+          Text(
+            category.name,
+            style: Theme.of(context).textTheme.labelSmall,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            textAlign: TextAlign.center,
+          ),
+        ],
       ),
     );
   }

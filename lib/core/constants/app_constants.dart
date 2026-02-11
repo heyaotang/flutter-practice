@@ -4,22 +4,22 @@ import 'package:flutter/material.dart';
 class AppConstants {
   AppConstants._();
 
+  // App Info
+  static const String appName = 'Flutter Practice';
+
+  // Theme
+  static const Color primarySeedColor = Colors.deepPurple;
+
   // Spacing
   static const double spacingSmall = 8.0;
   static const double spacingMedium = 16.0;
   static const double spacingLarge = 24.0;
   static const double spacingXLarge = 32.0;
 
-  // Text Styles
+  // Typography
   static const double fontSizeTitle = 24.0;
   static const double fontSizeBody = 16.0;
   static const double fontSizeCaption = 14.0;
-
-  // App Info
-  static const String appName = 'Flutter Practice';
-
-  // Theme
-  static const Color primarySeedColor = Colors.deepPurple;
 
   // Navigation
   static const List<String> tabTitles = [
@@ -28,6 +28,7 @@ class AppConstants {
     'Messages',
     'Profile',
   ];
+
   static const int homeTabIndex = 0;
   static const int categoriesTabIndex = 1;
   static const int messagesTabIndex = 2;
@@ -42,4 +43,11 @@ class AppConstants {
   static const IconData messagesIconActive = Icons.message;
   static const IconData profileIcon = Icons.person_outline;
   static const IconData profileIconActive = Icons.person;
+
+  // Home Page
+  static const double bannerHeight = 300.0;
+  static const double categoriesHeight = 100.0;
+  static const double categoryItemSize = 80.0;
+  static const int productBatchSize = 10;
+  static const double scrollLoadThreshold = 200.0;
 }

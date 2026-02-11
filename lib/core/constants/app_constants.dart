@@ -1,0 +1,45 @@
+import 'package:flutter/material.dart';
+
+/// App-wide constants for consistent styling and spacing.
+class AppConstants {
+  AppConstants._();
+
+  // Spacing
+  static const double spacingSmall = 8.0;
+  static const double spacingMedium = 16.0;
+  static const double spacingLarge = 24.0;
+  static const double spacingXLarge = 32.0;
+
+  // Text Styles
+  static const double fontSizeTitle = 24.0;
+  static const double fontSizeBody = 16.0;
+  static const double fontSizeCaption = 14.0;
+
+  // App Info
+  static const String appName = 'Flutter Practice';
+
+  // Theme
+  static const Color primarySeedColor = Colors.deepPurple;
+
+  // Navigation
+  static const List<String> tabTitles = [
+    'Home',
+    'Categories',
+    'Messages',
+    'Profile',
+  ];
+  static const int homeTabIndex = 0;
+  static const int categoriesTabIndex = 1;
+  static const int messagesTabIndex = 2;
+  static const int profileTabIndex = 3;
+
+  // Navigation Icons
+  static const IconData homeIcon = Icons.home_outlined;
+  static const IconData homeIconActive = Icons.home;
+  static const IconData categoriesIcon = Icons.category_outlined;
+  static const IconData categoriesIconActive = Icons.category;
+  static const IconData messagesIcon = Icons.message_outlined;
+  static const IconData messagesIconActive = Icons.message;
+  static const IconData profileIcon = Icons.person_outline;
+  static const IconData profileIconActive = Icons.person;
+}

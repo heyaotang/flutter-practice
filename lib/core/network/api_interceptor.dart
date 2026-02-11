@@ -1,5 +1,6 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
+import 'api_exception.dart';
 
 /// Combined interceptor for logging, auth, and response handling.
 class ApiInterceptor extends Interceptor {
@@ -9,19 +10,21 @@ class ApiInterceptor extends Interceptor {
     this.extractData = true,
   });
 
+  static const String _successCode = '0';
+  static const int _maxLogLength = 1000;
+  static const String _defaultErrorMessage = 'Unknown error';
+
   final bool enableLogging;
   final String? Function()? getToken;
   final bool extractData;
 
   @override
   void onRequest(RequestOptions options, RequestInterceptorHandler handler) {
-    // Add auth token if available.
     final token = getToken?.call();
     if (token != null && token.isNotEmpty) {
       options.headers['Authorization'] = 'Bearer $token';
     }
 
-    // Log request.
     if (enableLogging) {
       _logRequest(options);
     }
@@ -31,15 +34,32 @@ class ApiInterceptor extends Interceptor {
 
   @override
   void onResponse(Response response, ResponseInterceptorHandler handler) {
-    // Extract data from common response format.
     if (extractData && response.data is Map<String, dynamic>) {
       final data = response.data as Map<String, dynamic>;
+
+      final code = data['code'] as String?;
+      if (code != null && code != _successCode) {
+        final message = data['message'] as String? ?? _defaultErrorMessage;
+        handler.reject(
+          DioException(
+            requestOptions: response.requestOptions,
+            response: response,
+            type: DioExceptionType.badResponse,
+            error: ApiException(
+              message: message,
+              statusCode: response.statusCode,
+              errorCode: code,
+            ),
+          ),
+        );
+        return;
+      }
+
       if (data.containsKey('data')) {
         response.data = data['data'];
       }
     }
 
-    // Log response.
     if (enableLogging) {
       _logResponse(response);
     }
@@ -49,7 +69,6 @@ class ApiInterceptor extends Interceptor {
 
   @override
   void onError(DioException err, ErrorInterceptorHandler handler) {
-    // Log error.
     if (enableLogging) {
       _logError(err);
     }
@@ -81,11 +100,10 @@ class ApiInterceptor extends Interceptor {
 
     if (response.data != null) {
       final dataString = response.data.toString();
-      if (dataString.length > 1000) {
-        buffer.writeln('Data: ${dataString.substring(0, 1000)}...');
-      } else {
-        buffer.writeln('Data: $dataString');
-      }
+      final truncated = dataString.length > _maxLogLength
+          ? '${dataString.substring(0, _maxLogLength)}...'
+          : dataString;
+      buffer.writeln('Data: $truncated');
     }
 
     debugPrint(buffer.toString().trim());

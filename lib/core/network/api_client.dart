@@ -1,4 +1,5 @@
 import 'package:dio/dio.dart';
+
 import 'api_config.dart';
 import 'api_exception.dart';
 import 'api_interceptor.dart';
@@ -24,21 +25,15 @@ class ApiClient {
     final baseOptions = ApiConfig.dioOptions;
 
     // Apply custom overrides.
-    if (baseUrl != null) {
-      baseOptions.baseUrl = baseUrl;
-    }
+    if (baseUrl != null) baseOptions.baseUrl = baseUrl;
     if (connectTimeout != null) {
       baseOptions.connectTimeout = connectTimeout;
     }
     if (receiveTimeout != null) {
       baseOptions.receiveTimeout = receiveTimeout;
     }
-    if (sendTimeout != null) {
-      baseOptions.sendTimeout = sendTimeout;
-    }
-    if (headers != null) {
-      baseOptions.headers.addAll(headers);
-    }
+    if (sendTimeout != null) baseOptions.sendTimeout = sendTimeout;
+    if (headers != null) baseOptions.headers.addAll(headers);
 
     final dio = Dio(baseOptions);
 
@@ -75,18 +70,16 @@ class ApiClient {
     ProgressCallback? onReceiveProgress,
     T Function(dynamic data)? decoder,
   }) async {
-    try {
-      final response = await dio.get(
+    return _request<T>(
+      () => dio.get(
         path,
         queryParameters: queryParameters,
         options: options,
         cancelToken: cancelToken,
         onReceiveProgress: onReceiveProgress,
-      );
-      return decoder != null ? decoder(response.data) : response.data as T;
-    } on DioException catch (e) {
-      throw ApiException.fromDioError(e);
-    }
+      ),
+      decoder,
+    );
   }
 
   /// Performs a POST request.
@@ -100,20 +93,18 @@ class ApiClient {
     ProgressCallback? onReceiveProgress,
     T Function(dynamic data)? decoder,
   }) async {
-    try {
-      final response = await dio.post(
+    return _request<T>(
+      () => dio.post(
         path,
-        data: data,
+        data: data ?? {},
         queryParameters: queryParameters,
         options: options,
         cancelToken: cancelToken,
         onSendProgress: onSendProgress,
         onReceiveProgress: onReceiveProgress,
-      );
-      return decoder != null ? decoder(response.data) : response.data as T;
-    } on DioException catch (e) {
-      throw ApiException.fromDioError(e);
-    }
+      ),
+      decoder,
+    );
   }
 
   /// Performs a PUT request.
@@ -127,8 +118,8 @@ class ApiClient {
     ProgressCallback? onReceiveProgress,
     T Function(dynamic data)? decoder,
   }) async {
-    try {
-      final response = await dio.put(
+    return _request<T>(
+      () => dio.put(
         path,
         data: data,
         queryParameters: queryParameters,
@@ -136,11 +127,9 @@ class ApiClient {
         cancelToken: cancelToken,
         onSendProgress: onSendProgress,
         onReceiveProgress: onReceiveProgress,
-      );
-      return decoder != null ? decoder(response.data) : response.data as T;
-    } on DioException catch (e) {
-      throw ApiException.fromDioError(e);
-    }
+      ),
+      decoder,
+    );
   }
 
   /// Performs a PATCH request.
@@ -154,8 +143,8 @@ class ApiClient {
     ProgressCallback? onReceiveProgress,
     T Function(dynamic data)? decoder,
   }) async {
-    try {
-      final response = await dio.patch(
+    return _request<T>(
+      () => dio.patch(
         path,
         data: data,
         queryParameters: queryParameters,
@@ -163,11 +152,9 @@ class ApiClient {
         cancelToken: cancelToken,
         onSendProgress: onSendProgress,
         onReceiveProgress: onReceiveProgress,
-      );
-      return decoder != null ? decoder(response.data) : response.data as T;
-    } on DioException catch (e) {
-      throw ApiException.fromDioError(e);
-    }
+      ),
+      decoder,
+    );
   }
 
   /// Performs a DELETE request.
@@ -179,14 +166,24 @@ class ApiClient {
     CancelToken? cancelToken,
     T Function(dynamic data)? decoder,
   }) async {
-    try {
-      final response = await dio.delete(
+    return _request<T>(
+      () => dio.delete(
         path,
         data: data,
         queryParameters: queryParameters,
         options: options,
         cancelToken: cancelToken,
-      );
+      ),
+      decoder,
+    );
+  }
+
+  Future<T> _request<T>(
+    Future<Response> Function() request,
+    T Function(dynamic)? decoder,
+  ) async {
+    try {
+      final response = await request();
       return decoder != null ? decoder(response.data) : response.data as T;
     } on DioException catch (e) {
       throw ApiException.fromDioError(e);

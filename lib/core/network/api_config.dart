@@ -7,7 +7,7 @@ class ApiConfig {
   /// Base URL for API requests.
   static const String baseUrl = String.fromEnvironment(
     'API_BASE_URL',
-    defaultValue: 'https://pokeapi.co/api/v2',
+    defaultValue: 'http://localhost:3000',
   );
 
   /// Default connection timeout.
@@ -24,6 +24,9 @@ class ApiConfig {
     'Content-Type': 'application/json',
     'Accept': 'application/json',
   };
+
+  /// API endpoints.
+  static const String bannersEndpoint = '/get-banners';
 
   /// Dio options instance.
   static BaseOptions get dioOptions => BaseOptions(

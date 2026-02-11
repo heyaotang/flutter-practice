@@ -8,8 +8,12 @@ import 'package:flutter_practice/utils/utils.dart';
 class HomeBanner extends StatefulWidget {
   const HomeBanner({
     super.key,
+    required this.images,
     this.autoPlayInterval,
   });
+
+  /// List of banner image URLs.
+  final List<String> images;
 
   /// Custom auto-play interval. If null, uses [AppConstants.bannerAutoPlayInterval].
   final Duration? autoPlayInterval;
@@ -30,7 +34,8 @@ class _BannerPage extends StatefulWidget {
   State<_BannerPage> createState() => _BannerPageState();
 }
 
-class _BannerPageState extends State<_BannerPage> with AutomaticKeepAliveClientMixin {
+class _BannerPageState extends State<_BannerPage>
+    with AutomaticKeepAliveClientMixin {
   @override
   bool get wantKeepAlive => true;
 
@@ -53,7 +58,10 @@ class _BannerPageState extends State<_BannerPage> with AutomaticKeepAliveClientM
   ) {
     if (loadingProgress == null) return child;
 
-    final progress = loadingProgress.expectedTotalBytes != null ? loadingProgress.cumulativeBytesLoaded / loadingProgress.expectedTotalBytes! : null;
+    final progress = loadingProgress.expectedTotalBytes != null
+        ? loadingProgress.cumulativeBytesLoaded /
+            loadingProgress.expectedTotalBytes!
+        : null;
 
     return Container(
       color: Colors.grey[300],
@@ -89,23 +97,22 @@ class _HomeBannerState extends State<HomeBanner> {
   int _currentPage = _initialPage;
   Timer? _autoPlayTimer;
 
-  static const int _bannerCount = 5;
   static const int _initialPage = 1;
   static const int _dummyPageCount = 2;
+  static const int _animationDuration = 300;
+  static const double _indicatorBottomMargin = 16;
 
-  Duration get _autoPlayInterval => widget.autoPlayInterval ?? AppConstants.bannerAutoPlayInterval;
+  Duration get _autoPlayInterval =>
+      widget.autoPlayInterval ?? AppConstants.bannerAutoPlayInterval;
 
-  List<String> get _bannerImages {
-    final originals = List.generate(
-      _bannerCount,
-      (index) => 'https://placehold.co/300x200/673AB7/white?text=Banner+${index + 1}',
-    );
+  int get _bannerCount => widget.images.length;
 
-    // For infinite loop: [last] [...originals...] [first]
+  List<String> get _carouselImages {
+    if (widget.images.isEmpty) return [];
     return [
-      originals.last,
-      ...originals,
-      originals.first,
+      widget.images.last,
+      ...widget.images,
+      widget.images.first,
     ];
   }
 
@@ -136,7 +143,7 @@ class _HomeBannerState extends State<HomeBanner> {
       _currentPage++;
       _pageController.animateToPage(
         _currentPage,
-        duration: const Duration(milliseconds: 300),
+        duration: const Duration(milliseconds: _animationDuration),
         curve: Curves.easeInOut,
       );
     });
@@ -183,7 +190,7 @@ class _HomeBannerState extends State<HomeBanner> {
               onPageChanged: _handlePageChange,
               itemCount: _bannerCount + _dummyPageCount,
               itemBuilder: (context, index) {
-                return _BannerPage(imageUrl: _bannerImages[index]);
+                return _BannerPage(imageUrl: _carouselImages[index]);
               },
             ),
           ),
@@ -195,7 +202,7 @@ class _HomeBannerState extends State<HomeBanner> {
 
   Positioned _buildDotIndicators() {
     return Positioned(
-      bottom: 16,
+      bottom: _indicatorBottomMargin,
       left: 0,
       right: 0,
       child: Row(
@@ -219,16 +226,23 @@ class _DotIndicator extends StatelessWidget {
 
   final bool isActive;
 
+  static const int _fadeInDuration = 200;
+  static const double _indicatorSpacing = 4;
+  static const double _indicatorHeight = 8;
+  static const double _activeIndicatorWidth = 24;
+  static const double _inactiveIndicatorWidth = 8;
+  static const double _indicatorRadius = 4;
+
   @override
   Widget build(BuildContext context) {
     return AnimatedContainer(
-      duration: const Duration(milliseconds: 200),
-      margin: const EdgeInsets.symmetric(horizontal: 4),
-      height: 8,
-      width: isActive ? 24.0 : 8.0,
+      duration: const Duration(milliseconds: _fadeInDuration),
+      margin: const EdgeInsets.symmetric(horizontal: _indicatorSpacing),
+      height: _indicatorHeight,
+      width: isActive ? _activeIndicatorWidth : _inactiveIndicatorWidth,
       decoration: BoxDecoration(
         color: isActive ? Colors.white : Colors.white54,
-        borderRadius: BorderRadius.circular(4),
+        borderRadius: BorderRadius.circular(_indicatorRadius),
       ),
     );
   }

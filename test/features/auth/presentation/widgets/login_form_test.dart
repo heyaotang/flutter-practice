@@ -160,8 +160,9 @@ void main() {
       await tester.tap(find.byType(ElevatedButton));
       await tester.pump();
 
-      // Verify loading indicator is shown
-      expect(find.byType(CircularProgressIndicator), findsOneWidget);
+      // Verify loading dialog is shown
+      expect(find.text('Signing in...'), findsOneWidget);
+      expect(find.byType(CircularProgressIndicator), findsWidgets);
       expect(loginCalled, isTrue);
 
       // Complete the login

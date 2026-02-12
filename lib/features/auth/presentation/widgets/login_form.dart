@@ -62,16 +62,46 @@ class _LoginFormState extends State<LoginForm> {
 
     setState(() => _isLoading = true);
 
+    // Show loading dialog
+    if (mounted) {
+      showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (_) => PopScope(
+          canPop: false,
+          child: Center(
+            child: Container(
+              padding: const EdgeInsets.all(24),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: const Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  CircularProgressIndicator(),
+                  SizedBox(height: 16),
+                  Text('Signing in...'),
+                ],
+              ),
+            ),
+          ),
+        ),
+      );
+    }
+
     try {
       await widget.onLogin(
         _usernameController.text,
         _passwordController.text,
       );
       if (mounted) {
-        Navigator.of(context).pop();
+        Navigator.of(context).pop(); // Close loading dialog
+        Navigator.of(context).pop(); // Pop login page
       }
     } catch (e) {
       if (mounted) {
+        Navigator.of(context).pop(); // Close loading dialog
         showDialog(
           context: context,
           builder: (_) => AlertDialog(

@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_practice/core/constants/app_constants.dart';
 import 'package:flutter_practice/features/auth/data/models/user_profile.dart';
+import 'package:flutter_practice/features/auth/presentation/providers/auth_provider.dart';
+import 'package:provider/provider.dart';
 
 /// Anonymous user profile header (tappable to navigate to login).
 class AnonymousProfileHeader extends StatelessWidget {
@@ -57,6 +59,33 @@ class AuthenticatedProfileHeader extends StatelessWidget {
   static const double _borderRadius = 12.0;
   static const double _avatarRadius = 32.0;
 
+  Future<void> _handleSignOut(BuildContext context) async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (_) => AlertDialog(
+        title: const Text('Sign Out'),
+        content: const Text('Are you sure you want to sign out?'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(false),
+            child: const Text('Cancel'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(true),
+            child: const Text('Sign Out'),
+          ),
+        ],
+      ),
+    );
+
+    if (confirmed == true && context.mounted) {
+      await context.read<AuthProvider>().logout();
+      if (context.mounted) {
+        Navigator.of(context).pushReplacementNamed('/login');
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -83,11 +112,23 @@ class AuthenticatedProfileHeader extends StatelessWidget {
                 user.avatar.isEmpty ? const Icon(Icons.person, size: 32) : null,
           ),
           const SizedBox(width: AppConstants.spacingMedium),
-          Text(
-            user.username,
-            style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                  fontWeight: FontWeight.w600,
-                ),
+          Expanded(
+            child: Text(
+              user.username,
+              style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                    fontWeight: FontWeight.w600,
+                  ),
+            ),
+          ),
+          GestureDetector(
+            onTap: () => _handleSignOut(context),
+            child: Text(
+              'Sign Out',
+              style: TextStyle(
+                color: Colors.grey[600],
+                fontSize: 14,
+              ),
+            ),
           ),
         ],
       ),

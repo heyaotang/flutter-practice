@@ -155,6 +155,10 @@ fastify.post('/login', async (request, reply) => {
   }
 })
 
+fastify.post('/logout', async (request, reply) => {
+  return createSuccessResponse({});
+})
+
 fastify.post('/profile', async (request, reply) => {
   try {
     const auth = request.headers.authorization;

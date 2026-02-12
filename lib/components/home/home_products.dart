@@ -9,13 +9,16 @@ import 'package:flutter_practice/providers/product_provider.dart';
 ///
 /// Requires a [ScrollController] to be passed from the parent
 /// to monitor scroll position and trigger pagination.
+/// Optionally accepts a [provider] for external state coordination.
 class HomeProducts extends StatefulWidget {
   const HomeProducts({
     super.key,
     required this.scrollController,
+    this.provider,
   });
 
   final ScrollController scrollController;
+  final ProductProvider? provider;
 
   @override
   State<HomeProducts> createState() => _HomeProductsState();
@@ -28,16 +31,22 @@ class _HomeProductsState extends State<HomeProducts> {
   @override
   void initState() {
     super.initState();
-    _provider = ProductProvider()..loadMore();
+    _provider = widget.provider ?? ProductProvider()
+      ..loadMore();
     widget.scrollController.addListener(_scrollListener);
   }
 
   @override
   void dispose() {
     widget.scrollController.removeListener(_scrollListener);
-    _provider.dispose();
+    if (widget.provider == null) {
+      _provider.dispose();
+    }
     super.dispose();
   }
+
+  /// Exposes the product provider for parent widget access.
+  ProductProvider get productProvider => _provider;
 
   void _scrollListener() {
     if (_isLoadingMore || !_provider.hasMore) return;
@@ -56,14 +65,16 @@ class _HomeProductsState extends State<HomeProducts> {
     }
 
     if (remaining <= AppConstants.scrollLoadThresholdNear) {
-      debugPrint('Triggering loadMore - remaining=$remaining <= threshold=${AppConstants.scrollLoadThresholdNear}');
+      debugPrint('Triggering loadMore - remaining=$remaining <= '
+          'threshold=${AppConstants.scrollLoadThresholdNear}');
       _scheduleLoadMore();
     }
   }
 
   void _scheduleLoadMore() {
     if (_isLoadingMore || !_provider.hasMore) {
-      debugPrint('Skipping loadMore - isLoadingMore=$_isLoadingMore, hasMore=${_provider.hasMore}');
+      debugPrint('Skipping loadMore - isLoadingMore=$_isLoadingMore, '
+          'hasMore=${_provider.hasMore}');
       return;
     }
 

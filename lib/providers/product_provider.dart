@@ -13,12 +13,15 @@ class ProductProvider extends ChangeNotifier {
   String? _errorMessage;
   bool _hasMore = true;
   int _offset = 0;
+  bool _isRefreshing = false;
+  bool _allowInternalLoad = false;
 
   List<Product> get products => List.unmodifiable(_products);
   bool get isLoading => _isLoading;
   String? get errorMessage => _errorMessage;
   bool get hasError => _errorMessage != null;
   bool get hasMore => _hasMore;
+  bool get isRefreshing => _isRefreshing;
 
   static const int _pageSize = 20;
   static const String _loadErrorMessage =
@@ -26,6 +29,7 @@ class ProductProvider extends ChangeNotifier {
 
   Future<void> loadMore() async {
     if (_isLoading || (!_hasMore && _errorMessage == null)) return;
+    if (_isRefreshing && !_allowInternalLoad) return;
 
     _isLoading = true;
     _errorMessage = null;
@@ -60,5 +64,21 @@ class ProductProvider extends ChangeNotifier {
     _hasMore = true;
     _offset = 0;
     notifyListeners();
+  }
+
+  /// Refresh product list from scratch.
+  /// Clears existing data and reloads first page.
+  Future<void> refresh() async {
+    _isRefreshing = true;
+    _allowInternalLoad = true;
+    notifyListeners();
+    try {
+      reset();
+      await loadMore();
+    } finally {
+      _isRefreshing = false;
+      _allowInternalLoad = false;
+      notifyListeners();
+    }
   }
 }

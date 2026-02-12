@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_practice/components/home/components.dart';
 import 'package:flutter_practice/core/constants/app_constants.dart';
 import 'package:flutter_practice/providers/banner_provider.dart';
+import 'package:flutter_practice/providers/product_provider.dart';
 
 /// Home page displaying main app content.
 class HomePage extends StatefulWidget {
@@ -15,40 +16,72 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   final BannerProvider _bannerProvider = BannerProvider();
+  late final ProductProvider _productProvider;
   late final ScrollController _scrollController;
 
   @override
   void initState() {
     super.initState();
     _scrollController = ScrollController();
+    _productProvider = ProductProvider()..loadMore();
     _bannerProvider.fetchBanners();
   }
 
   @override
   void dispose() {
     _scrollController.dispose();
+    _productProvider.dispose();
     _bannerProvider.dispose();
     super.dispose();
+  }
+
+  /// Refreshes all content on the home page.
+  ///
+  /// Coordinates parallel refresh of banners and products using Future.wait
+  /// for optimal performance. Shows user-friendly error feedback via SnackBar
+  /// if refresh fails.
+  Future<void> _refreshAll() async {
+    try {
+      await Future.wait([
+        _bannerProvider.fetchBanners(),
+        _productProvider.refresh(),
+      ]);
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Failed to refresh. Please try again.'),
+          ),
+        );
+      }
+      rethrow;
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: SafeArea(
-        child: CustomScrollView(
-          controller: _scrollController,
-          slivers: [
-            SliverToBoxAdapter(
-              child: _BannerSection(provider: _bannerProvider),
-            ),
-            const SliverToBoxAdapter(child: HomeCategories()),
-            const SliverToBoxAdapter(child: _SectionHeader('Suggestions')),
-            const SliverToBoxAdapter(child: HomeSuggestions()),
-            const SliverToBoxAdapter(child: _SectionHeader('Hot Items')),
-            const SliverToBoxAdapter(child: HomeHots()),
-            const SliverToBoxAdapter(child: _SectionHeader('All Products')),
-            HomeProducts(scrollController: _scrollController),
-          ],
+        child: RefreshIndicator(
+          onRefresh: _refreshAll,
+          child: CustomScrollView(
+            controller: _scrollController,
+            slivers: [
+              SliverToBoxAdapter(
+                child: _BannerSection(provider: _bannerProvider),
+              ),
+              const SliverToBoxAdapter(child: HomeCategories()),
+              const SliverToBoxAdapter(child: _SectionHeader('Suggestions')),
+              const SliverToBoxAdapter(child: HomeSuggestions()),
+              const SliverToBoxAdapter(child: _SectionHeader('Hot Items')),
+              const SliverToBoxAdapter(child: HomeHots()),
+              const SliverToBoxAdapter(child: _SectionHeader('All Products')),
+              HomeProducts(
+                scrollController: _scrollController,
+                provider: _productProvider,
+              ),
+            ],
+          ),
         ),
       ),
     );

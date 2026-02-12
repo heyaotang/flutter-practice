@@ -18,13 +18,14 @@ class _HomePageState extends State<HomePage> {
   final BannerProvider _bannerProvider = BannerProvider();
   late final ProductProvider _productProvider;
   late final ScrollController _scrollController;
+  final GlobalKey<RefreshIndicatorState> _refreshIndicatorKey = GlobalKey<RefreshIndicatorState>();
 
   @override
   void initState() {
     super.initState();
     _scrollController = ScrollController();
-    _productProvider = ProductProvider()..loadMore();
-    _bannerProvider.fetchBanners();
+    _productProvider = ProductProvider();
+    Future.microtask(() => _refreshIndicatorKey.currentState?.show());
   }
 
   @override
@@ -63,6 +64,7 @@ class _HomePageState extends State<HomePage> {
     return Scaffold(
       body: SafeArea(
         child: RefreshIndicator(
+          key: _refreshIndicatorKey,
           onRefresh: _refreshAll,
           child: CustomScrollView(
             controller: _scrollController,

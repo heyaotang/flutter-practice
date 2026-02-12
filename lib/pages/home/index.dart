@@ -15,15 +15,18 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   final BannerProvider _bannerProvider = BannerProvider();
+  late final ScrollController _scrollController;
 
   @override
   void initState() {
     super.initState();
+    _scrollController = ScrollController();
     _bannerProvider.fetchBanners();
   }
 
   @override
   void dispose() {
+    _scrollController.dispose();
     _bannerProvider.dispose();
     super.dispose();
   }
@@ -33,6 +36,7 @@ class _HomePageState extends State<HomePage> {
     return Scaffold(
       body: SafeArea(
         child: CustomScrollView(
+          controller: _scrollController,
           slivers: [
             SliverToBoxAdapter(
               child: _BannerSection(provider: _bannerProvider),
@@ -43,7 +47,7 @@ class _HomePageState extends State<HomePage> {
             const SliverToBoxAdapter(child: _SectionHeader('Hot Items')),
             const SliverToBoxAdapter(child: HomeHots()),
             const SliverToBoxAdapter(child: _SectionHeader('All Products')),
-            const HomeProducts(),
+            HomeProducts(scrollController: _scrollController),
           ],
         ),
       ),

@@ -18,7 +18,8 @@ class _HomePageState extends State<HomePage> {
   final BannerProvider _bannerProvider = BannerProvider();
   late final ProductProvider _productProvider;
   late final ScrollController _scrollController;
-  final GlobalKey<RefreshIndicatorState> _refreshIndicatorKey = GlobalKey<RefreshIndicatorState>();
+  final GlobalKey<RefreshIndicatorState> _refreshIndicatorKey =
+      GlobalKey<RefreshIndicatorState>();
 
   @override
   void initState() {

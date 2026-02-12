@@ -134,6 +134,43 @@ fastify.post('/get-products', async (request, reply) => {
   }
 });
 
+fastify.post('/login', async (request, reply) => {
+  try {
+    const { username = '', password = '' } = request.body || {};
+    if (!username || !password) {
+      return createErrorResponse('Missing username or password');
+    }
+    if ('username' !== username || 'password' !== password) {
+      return createErrorResponse('Username or password is incorrect');
+    }
+    return createSuccessResponse({
+      tokenType: 'Bearer',
+      accessToken: generateUUID(),
+      refreshToken: generateUUID(),
+      expiresIn: 3600,
+    });
+  } catch (error) {
+    fastify.log.error('Error logging in:', error);
+    return reply.code(500).send(createErrorResponse('Failed to login'));
+  }
+})
+
+fastify.post('/profile', async (request, reply) => {
+  try {
+    const auth = request.headers.authorization;
+    if (!auth) {
+      return reply.code(401).send(createErrorResponse('Unauthorized'));
+    }
+    return createSuccessResponse({
+      username: 'username',
+      avatar: 'http://localhost:3000/assets/images/avatar/user.png',
+    });
+  } catch (error) {
+    fastify.log.error('Error fetching profile:', error);
+    return reply.code(500).send(createErrorResponse('Failed to fetch profile'));
+  }
+})
+
 // Start server
 try {
   await fastify.register(staticPlugin, {

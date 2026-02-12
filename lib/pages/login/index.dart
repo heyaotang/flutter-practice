@@ -1,31 +1,28 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_practice/core/constants/app_constants.dart';
-import 'package:flutter_practice/core/widgets/page_placeholder.dart';
+import 'package:flutter_practice/features/auth/presentation/providers/auth_provider.dart';
+import 'package:flutter_practice/features/auth/presentation/widgets/login_form.dart';
+import 'package:provider/provider.dart';
 
 /// Login page for user authentication.
 class LoginPage extends StatelessWidget {
   const LoginPage({super.key});
 
-  static const String title = 'Login Page';
+  static const String title = 'Login';
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Login'),
+        title: const Text(title),
       ),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            const PagePlaceholder(title: title),
-            const SizedBox(height: AppConstants.spacingLarge),
-            ElevatedButton(
-              onPressed: () => Navigator.pop(context),
-              child: const Text('Back'),
-            ),
-          ],
-        ),
+      body: Consumer<AuthProvider>(
+        builder: (context, auth, _) {
+          return LoginForm(
+            onLogin: (username, password) {
+              return auth.login(username, password);
+            },
+          );
+        },
       ),
     );
   }

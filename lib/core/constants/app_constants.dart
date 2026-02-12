@@ -47,4 +47,13 @@ class AppConstants {
   static const int productPageSize = 20;
   static const double scrollLoadThresholdNear = 50.0;
   static const int totalProducts = 102;
+
+  // Auth constants
+  static const String defaultAvatarUrl =
+      'http://localhost:3000/assets/images/avatar/user.png';
+  static const double loginButtonWidth = 200.0;
+  static const double loginButtonHeight = 50.0;
+  static const double loginButtonLoadingSize = 20.0;
+  static const double loginButtonLoadingStrokeWidth = 2.0;
+  static const double loginIconSize = 80.0;
 }
